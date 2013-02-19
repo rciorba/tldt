@@ -1,0 +1,4 @@
+#!/bin/sh
+rm -rf --one-file-system ./tldr_ve
+virtualenv create ./tldr_ve
+./tldr_ve/bin/python ./setup.py develop
