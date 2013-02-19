@@ -23,7 +23,7 @@ class Project(object):
         self.base_sha = base_sha
         self.config = ConfigParser.ConfigParser()
         self.config.read(configuration_path)
-        self.parsers = self.config.items("ActiveParser")
+        self.parsers = self.config.items("ActiveParsers")
         self.root_dir = None
         # FOOBAR
         self.tldt()
@@ -43,10 +43,10 @@ class Project(object):
         for parser_name, parser_module in self.parsers:
             try:
                 module = importlib.import_module(parser_module)
-                args = dict(self.config.items("parser-%s" % parser_name))
-                module.Parser(**args)
-            except ImportError:
-                print "Could not load '%s' parsing module" % parser_name
+                kargs = dict(self.config.items("parser-%s" % parser_name))
+                module.Parser(**kargs)
+            except ImportError as e:
+                print "Could not load '%s' parsing module.\n %r " % (parser_name, e)
 
     def post_results(self):
         pass

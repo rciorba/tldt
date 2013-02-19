@@ -16,3 +16,6 @@ class Parser(object):
 
     def line_warning(self, filename, lineno, warning_message):
         self.line_warnings.append((filename, lineno, warning_message))
+
+    def analyze(self):
+        raise NotImplementedError()
