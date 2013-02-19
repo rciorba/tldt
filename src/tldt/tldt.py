@@ -60,7 +60,7 @@ class Project(object):
     def tldt(self):
         self.checkout_code()
         self.setup_environment()
-        #self.run_tests()
+        self.run_tests()
         self.run_parsers()
         self.post_results()
 

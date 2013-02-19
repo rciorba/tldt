@@ -1,0 +1,2 @@
+#!/bin/sh
+./tldr_ve/bin/python -m tldt.git_test
