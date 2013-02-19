@@ -39,7 +39,7 @@ class Project(object):
 
     def setup_environment(self):
         with chdir(self.repo.local):
-            subprocess.check_call(["build/setup_environment"])
+            subprocess.check_call(["./build/setup_environment"])
 
     def run_tests(self):
         with chdir(self.repo.local):
@@ -59,7 +59,7 @@ class Project(object):
 
     def tldt(self):
         self.checkout_code()
-        #self.setup_environment()
+        self.setup_environment()
         #self.run_tests()
         self.run_parsers()
         self.post_results()
