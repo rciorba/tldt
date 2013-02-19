@@ -1,8 +1,11 @@
+from __future__ import absolute_import
 import contextlib
 import ConfigParser
 import importlib
 import os
 import subprocess
+
+from tldt import git
 
 
 @contextlib.contextmanager
@@ -24,19 +27,22 @@ class Project(object):
         self.config = ConfigParser.ConfigParser()
         self.config.read(configuration_path)
         self.parsers = self.config.items("ActiveParsers")
-        self.root_dir = None
+        self.repo = None
         # FOOBAR
         self.tldt()
 
     def checkout_code(self):
-        self.root_dir = "/path/to/code_chekout"
+        self.repo = git.Repo(self.config.get("repo", "local"))
+        self.repo.clone_or_update(self.base_repo)
+        self.repo.fetch(self.head_repo)
+        self.repo.checkout(self.head_sha)
 
     def setup_environment(self):
-        with chdir(self.root_dir):
+        with chdir(self.repo.local):
             subprocess.check_call(["build/setup_environment"])
 
     def run_tests(self):
-        with chdir(self.root_dir):
+        with chdir(self.repo.local):
             subprocess.check_call(["build/run_tests"])
 
     def run_parsers(self):
