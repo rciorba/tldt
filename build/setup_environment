@@ -3,4 +3,4 @@ rm -rf --one-file-system ./tldr_ve
 virtualenv ./tldr_ve
 source ./tldr_ve/bin/activate
 python setup.py develop
-pip install nose
+pip install nose==1.1.2
