@@ -23,7 +23,7 @@ def main():
     config.read(args.configuration)
     username = config.get("Auth", "username")
     password = config.get("Auth", "password")
-    gh = github.Github(user=username, password=password)
+    gh = github.Github(username, password)
     runner = tldt.Project(head_repo=args.head_repo,
                           head_sha=args.head_sha,
                           base_repo=args.base_repo,
