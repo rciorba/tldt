@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import contextlib
 import importlib
+import logging
 import os
 import subprocess
 
@@ -15,7 +16,7 @@ def chdir(dirname):
     os.chdir(cwd)
 
 
-class Comments(object):
+class Commenter(object):
 
     def __init__(self, github_user, github_password):
 
@@ -71,21 +72,27 @@ class Project(object):
         self.repo = None
 
     def checkout_code(self):
-        self.repo = git.Repo(self.config.get("repo", "local"))
+        local_checkout = self.config.get("repo", "local")
+        logging.info("Checking out source code from %s to %s" % (self.base_repo, local_checkout))
+        self.repo = git.Repo(local_checkout)
         self.repo.clone_or_update(self.base_repo)
         self.repo.fetch(self.head_repo)
         self.repo.checkout(self.head_sha)
 
     def setup_environment(self):
+        logging.info("Running environment setup")
         with chdir(self.repo.local):
             subprocess.check_call(["build/setup_environment"])
 
     def run_tests(self):
+        logging.info("Running tests")
         with chdir(self.repo.local):
             subprocess.check_call(["build/run_tests"])
 
     def run_parsers(self):
+        logging.info("Running parsers")
         for parser_name, parser_module in self.parsers:
+            logging.debug("Running parser %s" % parser_name)
             try:
                 module = importlib.import_module(parser_module)
                 kargs = dict(self.config.items("parser-%s" % parser_name))
@@ -93,9 +100,10 @@ class Project(object):
                 parser.analyze()
                 self.comment.load_parser_results(parser)
             except ImportError as e:
-                print "Could not load '%s' parsing module.Skipping...\n %r " % (parser_name, e)
+                logging.info("Could not load '%s' parsing module.Skipping...\n %r " % (parser_name, e))
 
     def post_results(self):
+        logging.info("Posting results to Github pull request")
         self.comment.post_comments()
 
     def tldt(self):
