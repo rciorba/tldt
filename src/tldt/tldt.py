@@ -104,10 +104,11 @@ class Project(object):
 
     def checkout_code(self):
         local_checkout = self.config.get("repo", "local")
-        logging.info("Checking out source code from %s to %s" % (self.base_repo, local_checkout))
+        logging.info("Fetching source from code from %s to %s" % (self.base_repo, local_checkout))
         self.repo = git.Repo(local_checkout)
         self.repo.clone_or_update(self.base_repo)
         self.repo.fetch(self.head_repo)
+        logging.info("Checking out source code from %s to %s" % (self.base_repo, local_checkout))
         self.repo.checkout(self.head_sha)
 
     def setup_environment(self):
