@@ -39,7 +39,7 @@ class Project(object):
 
     def setup_environment(self):
         with chdir(self.repo.local):
-            subprocess.check_call(["./build/setup_environment"])
+            subprocess.check_call(["build/setup_environment"])
 
     def run_tests(self):
         with chdir(self.repo.local):
@@ -52,7 +52,7 @@ class Project(object):
                 kargs = dict(self.config.items("parser-%s" % parser_name))
                 module.Parser(**kargs)
             except ImportError as e:
-                print "Could not load '%s' parsing module.\n %r " % (parser_name, e)
+                print "Could not load '%s' parsing module.Skipping...\n %r " % (parser_name, e)
 
     def post_results(self):
         pass

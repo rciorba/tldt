@@ -1,7 +1,4 @@
-try:
-    from lxml import etree
-except ImportError:
-    import xml.etree.ElementTree as etree
+from lxml import etree
 
 import tldt.parsers
 
