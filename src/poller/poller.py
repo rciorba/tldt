@@ -73,19 +73,21 @@ class Poller():
         comments_list = self.get_comments_for_pull_request(pull_request)
         latest_comment_by_tldl = self.get_latest_comment_by_user(comments_list, "tldl")
         if latest_comment_by_tldl == None: # new pull request
-            Project(self.get_head_sha_for_pull_request(pull_request), 
-                    self.get_head_repo_fullname_for_pull_request(pull_request), 
-                    self.get_base_repo_fullname_for_pull_request(pull_request), 
-                    self.get_base_sha_for_pull_request(pull_request), 
-                    config=self.config).tldt()
+            print "new revision"
+#            Project(self.get_head_sha_for_pull_request(pull_request), 
+#                    self.get_head_repo_fullname_for_pull_request(pull_request), 
+#                    self.get_base_repo_fullname_for_pull_request(pull_request), 
+#                    self.get_base_sha_for_pull_request(pull_request), 
+#                    config=self.config).tldt()
         else:
             revised_sha = self.extract_sha_from_comment(latest_comment_by_tldl)
             if revised_sha !=  self.get_head_sha_for_pull_request(pull_request): # commits exist after previous test run
-                Project(self.get_head_sha_for_pull_request(pull_request), 
-                    self.get_head_repo_fullname_for_pull_request(pull_request), 
-                    self.get_base_repo_fullname_for_pull_request(pull_request), 
-                    self.get_base_sha_for_pull_request(pull_request), 
-                    config=self.config).tldt()
+                print "revised an old revision"
+#                Project(self.get_head_sha_for_pull_request(pull_request), 
+#                    self.get_head_repo_fullname_for_pull_request(pull_request), 
+#                    self.get_base_repo_fullname_for_pull_request(pull_request), 
+#                    self.get_base_sha_for_pull_request(pull_request), 
+#                    config=self.config).tldt()
     
     def parse_all_open_pull_requests(self):
         for pull_request in self.get_all_open_pull_requests():            
