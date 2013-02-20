@@ -68,10 +68,10 @@ class Commenter(object):
         for warning in self.line_warnings:
             self._post_line_comment(warning)
         # foobar and needs refactoring
-        return len([itertools.chain(self.general_warnings,
-                                    self.line_warnings,
-                                    self.general_errors,
-                                    self.line_errors)]) == 0
+        return any((self.general_warnings,
+                   self.line_warnings,
+                   self.general_errors,
+                   self.line_errors))
 
 
 class Project(object):
@@ -118,12 +118,12 @@ class Project(object):
     def run_tests(self):
         logging.info("Running tests")
         with chdir(self.repo.local):
-            subprocess.check_call(["build/run_tests"])
+            subprocess.call(["build/run_tests"])
 
     def run_parsers(self):
         logging.info("Running parsers")
         for parser_name, parser_module in self.parsers:
-            logging.debug("Running parser %s" % parser_name)
+            logging.info("Running parser %s" % parser_name)
             try:
                 module = importlib.import_module(parser_module)
                 kargs = dict(self.config.items("parser-%s" % parser_name))
@@ -134,7 +134,8 @@ class Project(object):
             except ImportError:
                 logging.info("Could not load '%s' parsing module.Skipping...\n" % (parser_name))
             except Exception as e:
-                logging.warning("Could not parse '%s'. Original traceback \n%r" % (parser_name, e))
+                logging.warning("Could not parse '%s'", parser_name)
+                logging.exception(e)
 
     def post_results(self):
         logging.info("Posting results to Github pull request")
