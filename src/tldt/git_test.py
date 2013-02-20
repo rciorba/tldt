@@ -9,11 +9,13 @@ class TestGit(unittest.TestCase):
 
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='gittest')
+        self.tmp_repo_dir = tempfile.mkdtemp(prefix="gitrepo")
+        self.repo = git.Repo(self.tmp_repo_dir)
+        self.repo.git.init()
 
-    def test_spam(self):
+    def test_clone_and_checkout(self):
         repo = git.Repo(self.tmp_dir)
-        repo.clone("/home/rciorba/repos/tldt/.git")
-        repo.checkout('32bbf2dfc2de17fd10d665490d970960c3305bd2')
+        repo.clone(self.tmp_repo_dir)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)

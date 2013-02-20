@@ -1,2 +1,3 @@
-#!/bin/sh
-./tldr_ve/bin/python -m tldt.git_test
+#!/bin/bash
+source ./tldr_ve/bin/activate
+nosetests --with-xunit --xunit-file nosetests.xml
