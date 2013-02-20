@@ -1,4 +1,3 @@
 pygithub==1.11.1
 sh==1.08
 lxml==3.1.0
--e git://github.com/rciorba/python-unidiff.git#egg=unidiff
