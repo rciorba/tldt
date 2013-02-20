@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 import contextlib
 import importlib
-import itertools
 import logging
 import os
 import subprocess
@@ -139,7 +138,7 @@ class Project(object):
 
     def post_results(self):
         logging.info("Posting results to Github pull request")
-        self.comment.post_comments()
+        return self.comment.post_comments()
 
     def post_build_status(self, status):
         logging.info("Setting build status on pull request")
@@ -153,8 +152,8 @@ class Project(object):
             self.setup_environment()
             self.run_tests()
             self.run_parsers()
-            posted_results = self.post_results()
-            if not posted_results:
+            posted_comments = self.post_results()
+            if not posted_comments:
                 self.post_build_status(BuildStatus.SUCCESS)
             else:
                 self.post_build_status(BuildStatus.FAIL)
