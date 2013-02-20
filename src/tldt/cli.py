@@ -14,9 +14,9 @@ def main():
     parser.add_argument("head_sha")
     parser.add_argument("base_repo")
     parser.add_argument("base_sha")
-    parser.add_argument("pull_request_id")
     parser.add_argument("owner")
     parser.add_argument("repo")
+    parser.add_argument("pull_request_id")
     parser.add_argument("--configuration", default=os.path.join(user_home, "tldt.ini"))
     args = parser.parse_args()
     config = ConfigParser.ConfigParser()
@@ -28,6 +28,9 @@ def main():
                           head_sha=args.head_sha,
                           base_repo=args.base_repo,
                           base_sha=args.base_sha,
+                          owner=args.owner,
+                          repo=args.repo,
+                          pull_request_id=args.pull_request_id,
                           config=config, github=gh)
     runner.tldt()
 
