@@ -29,12 +29,12 @@ class BuildStatus(object):
 
 class Commenter(object):
 
-    def __init__(self, github):
-
+    def __init__(self, github, pull_commit):
         self.general_errors = []
         self.general_warnings = []
         self.line_errors = []
         self.line_warnings = []
+        self.pull_commit = pull_commit
 
     def load_parser_results(self, parser):
         self.general_errors.extend(parser.general_errors)
@@ -49,18 +49,18 @@ class Commenter(object):
         return "Warning: %s" % warning
 
     def _post_general_comment(self, comment):
-        pass
+        logging.info("Commenting '%s'" % comment)
+        self.pull_commit.create_comment(comment)
 
     def _post_line_comment(self, comment):
         pass
 
     def post_comments(self):
-        print "Got to posting comments"
         for error in self.general_errors:
-            self._post_general_comment(error)
+            self._post_general_comment(self._format_error_message(error))
 
         for warning in self.general_warnings:
-            self._post_general_comment(warning)
+            self._post_general_comment(self._format_warning_message(warning))
 
         for error in self.line_errors:
             self._post_line_comment(error)
@@ -90,9 +90,17 @@ class Project(object):
         self.github = github
 
         self.config = config
-        self.comment = Commenter(self.github)
+        self._pull_request_commit = None
+        self.comment = Commenter(self.github, self.pull_request_commit)
         self.parsers = self.config.items("ActiveParsers")
         self.repo = None
+
+    @property
+    def pull_request_commit(self):
+        if self._pull_request_commit is None:
+            repo = self.github.get_user(self.owner).get_repo(self.repo_name)
+            self._pull_request_commit = repo.get_commit(self.head_sha)
+        return self._pull_request_commit
 
     def checkout_code(self):
         local_checkout = self.config.get("repo", "local")
@@ -134,10 +142,8 @@ class Project(object):
 
     def post_build_status(self, status):
         logging.info("Setting build status on pull request")
-        repo = self.github.get_user(self.owner).get_repo(self.repo_name)
-        commit = repo.get_commit(self.head_sha)
         status_code, description = status
-        commit.create_status(status_code, description=description)
+        self.pull_request_commit.create_status(status_code, description=description)
 
     def tldt(self):
         self.post_build_status(BuildStatus.PENDING)
