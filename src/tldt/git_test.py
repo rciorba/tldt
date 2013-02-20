@@ -17,6 +17,11 @@ class TestGit(unittest.TestCase):
         repo = git.Repo(self.tmp_dir)
         repo.clone(self.tmp_repo_dir)
 
+    def test_fail(self):
+        # This test should always fail in order to
+        # test the tldt github pull request messaging
+        self.assertTrue(False)
+
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
 
