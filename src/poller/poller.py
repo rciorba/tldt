@@ -105,7 +105,8 @@ def main():
     parser = argparse.ArgumentParser(description="xx")
     parser.add_argument("--configuration", default=os.path.join(user_home, "tldt.ini"))
     args = parser.parse_args()
-    config = ConfigParser.ConfigParser(args.configuration)
+    config = ConfigParser.ConfigParser()
+    config.read(args.configuration)
     poller = Poller(config)
     poller.poll()
     
