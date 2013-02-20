@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import contextlib
 import importlib
+import itertools
 import logging
 import os
 import subprocess
@@ -19,9 +20,16 @@ def chdir(dirname):
     os.chdir(cwd)
 
 
+class BuildStatus(object):
+    PENDING = ("pending", "The build is in progress")
+    SUCCESS = ("success", "The build was successfull")
+    ERROR = ("error", "The were errors encountered when building")
+    FAIL = ("failed", "The build failed")
+
+
 class Commenter(object):
 
-    def __init__(self, github_user, github_password):
+    def __init__(self, github):
 
         self.general_errors = []
         self.general_warnings = []
@@ -59,18 +67,30 @@ class Commenter(object):
 
         for warning in self.line_warnings:
             self._post_line_comment(warning)
+        # foobar and needs refactoring
+        return len([itertools.chain(self.general_warnings,
+                                    self.line_warnings,
+                                    self.general_errors,
+                                    self.line_errors)]) == 0
 
 
 class Project(object):
 
     def __init__(self, head_repo, head_sha, base_repo, base_sha,
-                 config, comment):
+                 owner, repo, pull_request_id, config, github):
+        # Maybe extract in different object
+        # Along with gh integration
         self.head_repo = head_repo
         self.head_sha = head_sha
         self.base_repo = base_repo
         self.base_sha = base_sha
+        self.owner = owner
+        self.repo_name = repo
+        self.pull_request_id = pull_request_id
+        self.github = github
+
         self.config = config
-        self.comment = comment
+        self.comment = Commenter(self.github)
         self.parsers = self.config.items("ActiveParsers")
         self.repo = None
 
@@ -112,9 +132,25 @@ class Project(object):
         logging.info("Posting results to Github pull request")
         self.comment.post_comments()
 
+    def post_build_status(self, status):
+        logging.info("Setting build status on pull request")
+        repo = self.github.get_user(self.owner).get_repo(self.repo_name)
+        commit = repo.get_commit(self.head_sha)
+        status_code, description = status
+        commit.create_status(status_code, description=description)
+
     def tldt(self):
-        self.checkout_code()
-        self.setup_environment()
-        self.run_tests()
-        self.run_parsers()
-        self.post_results()
+        self.post_build_status(BuildStatus.PENDING)
+        try:
+            self.checkout_code()
+            self.setup_environment()
+            self.run_tests()
+            self.run_parsers()
+            posted_results = self.post_results()
+            if not posted_results:
+                self.post_build_status(BuildStatus.SUCCESS)
+            else:
+                self.post_build_status(BuildStatus.FAIL)
+        except Exception as e:
+            logging.error(e)
+            self.post_build_status(BuildStatus.ERROR)
