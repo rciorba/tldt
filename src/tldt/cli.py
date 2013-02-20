@@ -19,7 +19,7 @@ def main():
     username = config.get("Auth", "username")
     password = config.get("Auth", "password")
 
-    comment = tldt.Commenter(username=username, password=password)
+    comment = tldt.Commenter(github_user=username, github_password=password)
     runner = tldt.Project(head_repo=args.head_repo,
                           head_sha=args.head_sha,
                           base_repo=args.base_repo,

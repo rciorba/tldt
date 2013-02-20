@@ -8,6 +8,9 @@ import subprocess
 from tldt import git
 
 
+logging.BasicConfig(level=logging.INFO)
+
+
 @contextlib.contextmanager
 def chdir(dirname):
     cwd = os.getcwd()
