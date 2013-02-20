@@ -23,7 +23,7 @@ class BuildStatus(object):
     PENDING = ("pending", "The build is in progress")
     SUCCESS = ("success", "The build was successfull")
     ERROR = ("error", "The were errors encountered when building")
-    FAIL = ("failed", "The build failed")
+    FAIL = ("failure", "The build failed")
 
 
 class Commenter(object):
