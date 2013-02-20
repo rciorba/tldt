@@ -14,7 +14,7 @@ class Poller():
         self.config = config
         self.username = self.config.get("Auth", "username")
         self.password = self.config.get("Auth", "password")
-        self.git_user = self.config.get("Auth", "repo_user")
+        self.git_user = self.config.get("Auth", "repo_owner")
         self.repo = self.config.get("Auth", "repo_name")
         self.poll_interval = self.config.get("Poller", "poll_interval")
 
@@ -94,7 +94,7 @@ class Poller():
     def poll(self):
         while True:
             self.parse_all_open_pull_requests()
-            time.sleep(self.poll_interval)
+            time.sleep(int(float(self.poll_interval)))
     
     
 
