@@ -100,7 +100,8 @@ class Project(object):
                 module = importlib.import_module(parser_module)
                 kargs = dict(self.config.items("parser-%s" % parser_name))
                 parser = module.Parser(**kargs)
-                parser.analyze()
+                with chdir(self.repo.local):
+                    parser.analyze()
                 self.comment.load_parser_results(parser)
             except ImportError:
                 logging.info("Could not load '%s' parsing module.Skipping...\n" % (parser_name))

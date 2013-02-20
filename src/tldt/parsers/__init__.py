@@ -1,9 +1,10 @@
 class Parser(object):
 
-    general_errors = []
-    general_warnings = []
-    line_errors = []
-    line_warnings = []
+    def __init__(self):
+        self.general_errors = []
+        self.general_warnings = []
+        self.line_errors = []
+        self.line_warnings = []
 
     def general_error(self, error_message):
         self.general_errors.append(error_message)
