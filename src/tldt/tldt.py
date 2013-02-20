@@ -8,7 +8,7 @@ import subprocess
 from tldt import git
 
 
-logging.BasicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
 @contextlib.contextmanager
@@ -102,8 +102,10 @@ class Project(object):
                 parser = module.Parser(**kargs)
                 parser.analyze()
                 self.comment.load_parser_results(parser)
-            except ImportError as e:
-                logging.info("Could not load '%s' parsing module.Skipping...\n %r " % (parser_name, e))
+            except ImportError:
+                logging.info("Could not load '%s' parsing module.Skipping...\n" % (parser_name))
+            except Exception as e:
+                logging.warning("Could not parse '%s'. Original traceback \n%r" % (parser_name, e))
 
     def post_results(self):
         logging.info("Posting results to Github pull request")
