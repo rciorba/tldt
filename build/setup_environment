@@ -4,3 +4,4 @@ virtualenv ./tldr_ve
 source ./tldr_ve/bin/activate
 python setup.py develop
 pip install nose==1.1.2
+pip install -e git+git@github.com:rciorba/python-unidiff.git#egg=unidiff
