@@ -1,11 +1,12 @@
 
-import argparse
+from tldt.tldt import Project
 import ConfigParser
+import argparse
 import json
 import os.path
 import requests
+import time
 
-from tldt.tldt import Project
 
 class Poller():
     
@@ -15,6 +16,7 @@ class Poller():
         self.password = self.config.get("Auth", "password")
         self.git_user = self.config.get("Auth", "repo_user")
         self.repo = self.config.get("Auth", "repo_name")
+        self.poll_interval = self.config.get("Poller", "poll_interval")
 
     def get_content_from_url(self, url):
         r = requests.get(url)
@@ -89,7 +91,12 @@ class Poller():
         for pull_request in self.get_all_open_pull_requests():            
             self.run_tldt_for_pull_request_if_needed(pull_request)
 
-
+    def poll(self):
+        while True:
+            self.parse_all_open_pull_requests()
+            time.sleep(self.poll_interval)
+    
+    
 
 def main():
     user_home = os.path.expanduser("~")
@@ -98,14 +105,10 @@ def main():
     args = parser.parse_args()
     config = ConfigParser.ConfigParser(args.configuration)
     poller = Poller(config)
-    poller.parse_all_open_pull_requests()
+    poller.poll()
     
 if __name__ == "__main__":
     main()
-
-
-#file_readed = open("comments.json")
-#all_comments = json.loads(file_readed.read())
 
 
 '''
