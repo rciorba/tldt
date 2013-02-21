@@ -1,4 +1,5 @@
 #!/bin/bash
 source ./tldr_ve/bin/activate
 nosetests --with-xunit --xunit-file nosetests.xml
+pylint src/tldt -f parseable -r n | egrep ".+:[0-9]+: \[" > pylint.txt
 exit 0
