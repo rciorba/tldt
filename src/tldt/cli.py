@@ -2,6 +2,7 @@ import argparse
 import os.path
 import ConfigParser
 
+import requests
 import github
 
 import tldt
@@ -24,6 +25,7 @@ def main():
     username = config.get("Auth", "username")
     password = config.get("Auth", "password")
     gh = github.Github(username, password)
+    diff = functools.partial(requests, auth=(username, password))
     runner = tldt.Project(head_repo=args.head_repo,
                           head_sha=args.head_sha,
                           base_repo=args.base_repo,
@@ -31,7 +33,8 @@ def main():
                           owner=args.owner,
                           repo=args.repo,
                           pull_request_id=args.pull_request_id,
-                          config=config, github=gh)
+                          config=config, github=gh,
+                          diff_factory=diff)
     runner.tldt()
 
 if __name__ == '__main__':

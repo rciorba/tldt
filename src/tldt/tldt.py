@@ -29,14 +29,14 @@ class BuildStatus(object):
 
 class Commenter(object):
 
-    def __init__(self, github, pull_commit, pull_request):
+    def __init__(self, github, pull_commit, pull_request, diff_factory):
         self.general_errors = []
         self.general_warnings = []
         self.line_errors = []
         self.line_warnings = []
         self.pull_commit = pull_commit
         self.pull_request = pull_request
-
+        self.diff = diff_factory(pull_request.diff_url)
 
     def load_parser_results(self, parser):
         self.general_errors.extend(parser.general_errors)
@@ -82,7 +82,7 @@ class Commenter(object):
 class Project(object):
 
     def __init__(self, head_repo, head_sha, base_repo, base_sha,
-                 owner, repo, pull_request_id, config, github):
+                 owner, repo, pull_request_id, config, github, diff_factory):
         # Maybe extract in different object
         # Along with gh integration
         self.head_repo = head_repo
@@ -97,7 +97,7 @@ class Project(object):
 
         self.config = config
         self._pull_request_commit = None
-        self.comment = Commenter(self.github, self.pull_request_commit, self.pull_request)
+        self.comment = Commenter(self.github, self.pull_request_commit, self.pull_request, diff_factory)
         self.parsers = self.config.items("ActiveParsers")
         self.repo = None
 
