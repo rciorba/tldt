@@ -17,6 +17,4 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules'"],
     entry_points={
-        "console_scripts": ["tldt = tldt.cli:main"]
-        },
-    install_requires=requirements)
+        "console_scripts": ["tldt = tldt.cli:main"]})
