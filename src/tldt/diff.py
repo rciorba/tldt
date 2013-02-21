@@ -1,6 +1,7 @@
 import unidiff
 from cStringIO import StringIO
 import logging
+import sh # unused
 
 logger = logging.getLogger(__name__)
 
