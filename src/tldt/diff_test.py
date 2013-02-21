@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import unittest
-from cStringIO import StringIO
 
 from tldt.diff import Mapper
 
@@ -24,14 +23,14 @@ index ce9563d..aaed168 100644
 
 class TestMapper(unittest.TestCase):
     def setUp(self):
-        self.mapper = Mapper(StringIO(DIFF))
+        self.mapper = Mapper(DIFF)
 
     def test_mapping(self):
         self.assertIn("docs/tldt.ini", self.mapper._map)
 
     def test_file_to_diff(self):
         linum = self.mapper.file_to_diff("docs/tldt.ini", 15)
-        self.assertEqual(linum, 14)
+        self.assertEqual(linum, 10)
 
 
 if __name__ == '__main__':

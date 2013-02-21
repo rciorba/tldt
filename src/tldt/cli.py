@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import ConfigParser
+import functools
 
 import requests
 import github
@@ -25,7 +26,7 @@ def main():
     username = config.get("Auth", "username")
     password = config.get("Auth", "password")
     gh = github.Github(username, password)
-    diff = functools.partial(requests, auth=(username, password))
+    diff = functools.partial(requests.get, auth=(username, password))
     runner = tldt.Project(head_repo=args.head_repo,
                           head_sha=args.head_sha,
                           base_repo=args.base_repo,
