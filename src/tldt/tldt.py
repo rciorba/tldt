@@ -18,6 +18,7 @@ def chdir(dirname):
     yield
     os.chdir(cwd)
 
+# pylint: disable=W1201,R0201
 
 class BuildStatus(object):
     PENDING = ("pending", "The build is in progress")
@@ -28,12 +29,14 @@ class BuildStatus(object):
 
 class Commenter(object):
 
-    def __init__(self, github, pull_commit):
+    def __init__(self, github, pull_commit, pull_request):
         self.general_errors = []
         self.general_warnings = []
         self.line_errors = []
         self.line_warnings = []
         self.pull_commit = pull_commit
+        self.pull_request = pull_request
+
 
     def load_parser_results(self, parser):
         self.general_errors.extend(parser.general_errors)
@@ -51,8 +54,10 @@ class Commenter(object):
         logging.info("Commenting '%s'" % comment)
         self.pull_commit.create_comment(comment)
 
-    def _post_line_comment(self, comment):
-        pass
+    def _post_line_comment(self, file_path, line_number, comment):
+        # todo use mapper
+        print file_path, line_number, comment
+        # self.pull_request.create_comment(comment, self.pull_commit, file_path, line_number)
 
     def post_comments(self):
         for error in self.general_errors:
@@ -62,10 +67,11 @@ class Commenter(object):
             self._post_general_comment(self._format_warning_message(warning))
 
         for error in self.line_errors:
-            self._post_line_comment(error)
+            self._post_line_comment(*error)
 
         for warning in self.line_warnings:
-            self._post_line_comment(warning)
+            self._post_line_comment(*warning)
+
         # foobar and needs refactoring
         return any((self.general_warnings,
                    self.line_warnings,
@@ -85,21 +91,31 @@ class Project(object):
         self.base_sha = base_sha
         self.owner = owner
         self.repo_name = repo
-        self.pull_request_id = pull_request_id
+        self.pull_request_id = int(pull_request_id)
         self.github = github
+        self._repo = None
 
         self.config = config
         self._pull_request_commit = None
-        self.comment = Commenter(self.github, self.pull_request_commit)
+        self.comment = Commenter(self.github, self.pull_request_commit, self.pull_request)
         self.parsers = self.config.items("ActiveParsers")
         self.repo = None
 
     @property
+    def gh_repo(self):
+        if self._repo is None:
+            self._repo = self.github.get_user(self.owner).get_repo(self.repo_name)
+        return self._repo
+
+    @property
     def pull_request_commit(self):
         if self._pull_request_commit is None:
-            repo = self.github.get_user(self.owner).get_repo(self.repo_name)
-            self._pull_request_commit = repo.get_commit(self.head_sha)
+            self._pull_request_commit = self.gh_repo.get_commit(self.head_sha)
         return self._pull_request_commit
+
+    @property
+    def pull_request(self):
+        return self._repo.get_pull(self.pull_request_id)
 
     def checkout_code(self):
         local_checkout = self.config.get("repo", "local")
