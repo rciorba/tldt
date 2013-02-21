@@ -5,7 +5,7 @@ import logging
 import os
 import subprocess
 
-from tldt import git
+from tldt import git, diff
 
 
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +36,8 @@ class Commenter(object):
         self.line_warnings = []
         self.pull_commit = pull_commit
         self.pull_request = pull_request
-        self.diff = diff_factory(pull_request.diff_url)
+        self.diff = diff_factory(pull_request.diff_url).text
+        self.mapper = diff.Mapper(self.diff)
 
     def load_parser_results(self, parser):
         self.general_errors.extend(parser.general_errors)
@@ -55,9 +56,9 @@ class Commenter(object):
         self.pull_commit.create_comment(comment)
 
     def _post_line_comment(self, file_path, line_number, comment):
-        # todo use mapper
-        print file_path, line_number, comment
-        # self.pull_request.create_comment(comment, self.pull_commit, file_path, line_number)
+        line_number = self.mapper.file_to_diff(file_path, line_number)
+        if line_number:
+            self.pull_request.create_comment(comment, self.pull_commit, file_path, line_number)
 
     def post_comments(self):
         for error in self.general_errors:
@@ -175,5 +176,5 @@ class Project(object):
             else:
                 self.post_build_status(BuildStatus.FAIL)
         except Exception as e:
-            logging.error(e)
+            logging.exception(e)
             self.post_build_status(BuildStatus.ERROR)
