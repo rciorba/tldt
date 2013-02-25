@@ -38,6 +38,7 @@ class Commenter(object):
         self.pull_request = pull_request
         self.diff = diff_factory(pull_request.diff_url).text
         self.mapper = diff.Mapper(self.diff)
+        print self.mapper.file_to_diff("src/tldt/diff.py", 4)
 
 
     def load_parser_results(self, parser):
@@ -57,9 +58,13 @@ class Commenter(object):
         self.pull_commit.create_comment(comment)
 
     def _post_line_comment(self, file_path, line_number, comment):
-        line_number = self.mapper.file_to_diff(file_path, line_number)
-        if line_number:
-            self.pull_request.create_comment(comment, self.pull_commit, file_path, line_number)
+        diff_ln = self.mapper.file_to_diff(file_path, line_number)
+        if diff_ln:
+            logging.info("error at %s:%d(%d)" % (file_path, line_number, diff_ln))
+            self.pull_request.create_comment(comment, self.pull_commit, file_path, diff_ln)
+        else:
+            logging.info("ignoring error at %s:%s %s" % (file_path, line_number, comment))
+
 
     def post_comments(self):
         for error in self.general_errors:

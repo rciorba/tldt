@@ -14,4 +14,4 @@ class Parser(tldt.parsers.Parser):
     def _parse_content(self, content):
         for line in content:
             fname, linum, msg = line.split(":", 2)
-            self.line_error(fname, linum, msg)
+            self.line_error(fname, int(linum), msg)

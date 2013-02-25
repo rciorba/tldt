@@ -17,13 +17,15 @@ class Mapper(object):
     def file_to_diff(self, filename, linum):
         f = self._map.get(filename, None)
         if f is None:
-            logger.info("ignoring error at %s:%s" % (filename, linum))
             return None
-        diff_line = 0
+        hunk_offset = 0
         for hunk in f:
-            diff_line += hunk.length + 1  # account for hunk range info
-            start = hunk.target_start + hunk.start_context
-            # -1 because first line of hunk is at target_start
-            end = hunk.target_start + hunk.target_length - 1 - hunk.end_context
-            if start <= linum <= end:
-                return diff_line
+            start = hunk.target_start
+            end = hunk.target_start + hunk.target_length - 1
+            if not(start <= linum <= end):
+                hunk_offset += len(hunk.original_lines) + 1  # account for hunk header
+                continue
+            offset = linum - hunk.target_start
+            final_line = offset + 1
+            if hunk.original_types[offset] == '+':
+                return final_line + hunk_offset
