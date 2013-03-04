@@ -77,13 +77,12 @@ class TestMapper(unittest.TestCase):
         self.assertIn("requirements.txt", self.mapper._map)
 
     def test_file_to_diff(self):
-        # import ipdb; ipdb.set_trace()
         linum = self.mapper.file_to_diff("src/tldt/diff.py", 4)
         self.assertEqual(linum, 4)
         linum = self.mapper.file_to_diff("requirements.txt", 3)
-        self.assertEqual(linum, 4)
+        self.assertEqual(linum, None)  # context line
         linum = self.mapper.file_to_diff("src/tldt/tldt.py", 124)
-        self.assertEqual(linum, 14)
+        self.assertEqual(linum, 13)
 
 
 if __name__ == '__main__':

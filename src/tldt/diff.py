@@ -18,12 +18,14 @@ class Mapper(object):
         f = self._map.get(filename, None)
         if f is None:
             return None
-        diff_line = 0
-        import ipdb; ipdb.set_trace()
+        hunk_offset = 0
         for hunk in f:
             start = hunk.target_start
-            # -1 because first line of hunk is at target_start
-            end = hunk.target_start + hunk.target_length - 1 - hunk.end_context
-            if start <= linum <= end:
-                return linum - hunk.target_start + diff_line + 1
-            diff_line += hunk.length + 2  # account for hunk range info
+            end = hunk.target_start + hunk.target_length - 1
+            if not(start <= linum <= end):
+                hunk_offset += len(hunk.original_lines) + 1  # account for hunk header
+                continue
+            offset = linum - hunk.target_start
+            final_line = offset + 1
+            if hunk.original_types[offset] == '+':
+                return final_line + hunk_offset
